@@ -122,14 +122,14 @@ static unsigned long core_exceeded_cmd_rate(cmd_rec *cmd) {
 
 static int core_idle_timeout_cb(CALLBACK_FRAME) {
   /* We don't want to quit in the middle of a transfer */
-  if (session.sf_flags & SF_XFER) { 
- 
+  if (session.sf_flags & SF_XFER) {
+
     /* Restart the timer. */
-    return 1; 
+    return 1;
   }
- 
+
   pr_event_generate("core.timeout-idle", NULL);
- 
+
   pr_response_send_async(R_421,
     _("Idle timeout (%d seconds): closing control connection"),
     pr_data_get_timeout(PR_DATA_TIMEOUT_IDLE));
@@ -700,7 +700,7 @@ MODRET set_scoreboardscrub(cmd_rec *cmd) {
 
   CHECK_ARGS(cmd, 1);
   CHECK_CONF(cmd, CONF_ROOT);
- 
+
   bool = get_boolean(cmd, 1);
   if (bool == -1) {
     /* If this is the case, try handling the parameter as the number of
@@ -1104,7 +1104,7 @@ MODRET set_socketoptions(cmd_rec *cmd) {
             "badly formatted TCP keepalive spec '", cmd->argv[i+1], "'", NULL));
         }
 
-        *ptr2 = '\0'; 
+        *ptr2 = '\0';
         count = atoi(keepalive_spec);
 
         keepalive_spec = ptr2 + 1;
@@ -1182,7 +1182,7 @@ MODRET set_multilinerfc2228(cmd_rec *cmd) {
   c = add_config_param(cmd->argv[0], 1, NULL);
   c->argv[0] = pcalloc(c->pool, sizeof(int));
   *((int *) c->argv[0]) = bool;
- 
+
   return PR_HANDLED(cmd);
 }
 
@@ -1415,7 +1415,7 @@ MODRET set_trace(cmd_rec *cmd) {
 
     c = add_config_param(cmd->argv[0], 0);
     c->argc = cmd->argc - 2;
-    c->argv = pcalloc(c->pool, ((c->argc + 1) * sizeof(char *))); 
+    c->argv = pcalloc(c->pool, ((c->argc + 1) * sizeof(char *)));
 
     for (i = idx; i < cmd->argc; i++) {
       char *ptr;
@@ -1590,7 +1590,7 @@ MODRET set_unsetenv(cmd_rec *cmd) {
   CHECK_ARGS(cmd, 1);
   CHECK_CONF(cmd, CONF_ROOT|CONF_VIRTUAL|CONF_GLOBAL);
 
-  add_config_param_str(cmd->argv[0], 1, cmd->argv[1]); 
+  add_config_param_str(cmd->argv[0], 1, cmd->argv[1]);
 
   /* In addition, if this is the "server config" context, unset the
    * environ variable now.  If there was a <Daemon> context, that would
@@ -2178,7 +2178,7 @@ MODRET set_hidefiles(cmd_rec *cmd) {
     int res;
 
     pre = pr_regexp_alloc(&core_module);
-  
+
     res = pr_regexp_compile(pre, cmd->argv[1], REG_EXTENDED|REG_NOSUB);
     if (res != 0) {
       char errstr[200] = {'\0'};
@@ -2575,7 +2575,7 @@ MODRET add_limit(cmd_rec *cmd) {
       have_cdup = TRUE;
 
     } else if (strcasecmp(elts[i], C_XCUP) == 0) {
-      have_xcup = TRUE; 
+      have_xcup = TRUE;
 
     } else if (strcasecmp(elts[i], C_MKD) == 0) {
       have_mkd = TRUE;
@@ -2667,7 +2667,7 @@ MODRET set_allowdenyusergroupclass(cmd_rec *cmd) {
   char **argv;
   int argc, eval_type;
   array_header *acl;
- 
+
   CHECK_CONF(cmd, CONF_LIMIT);
 
   if (cmd->argc < 2)
@@ -2830,7 +2830,7 @@ MODRET set_allowdeny(cmd_rec *cmd) {
         acl = pr_netacl_create(c->pool, ent);
         if (acl == NULL) {
           CONF_ERROR(cmd, pstrcat(cmd->tmp_pool, "bad ACL definition '",
-            ent, "': ", strerror(errno), NULL));     
+            ent, "': ", strerror(errno), NULL));
         }
 
         pr_trace_msg("netacl", 9, "'%s' parsed into netacl '%s'", ent,
@@ -3293,7 +3293,7 @@ MODRET core_quit(cmd_rec *cmd) {
     displayquit_fh = NULL;
 
   } else {
-    char *display = get_param_ptr(TOPLEVEL_CONF, "DisplayQuit", FALSE); 
+    char *display = get_param_ptr(TOPLEVEL_CONF, "DisplayQuit", FALSE);
     if (display) {
       if (pr_display_file(display, NULL, R_221, flags) < 0) {
         pr_log_debug(DEBUG6, "unable to display DisplayQuit file '%s': %s",
@@ -3518,7 +3518,7 @@ MODRET core_pasv(cmd_rec *cmd) {
    */
   pr_response_add(R_227, "Entering Passive Mode (%s,%u,%u).", addrstr,
     (port >> 8) & 255, port & 255);
- 
+
   return PR_HANDLED(cmd);
 }
 
@@ -3535,11 +3535,15 @@ MODRET core_port(cmd_rec *cmd) {
   config_rec *c;
   const char *proto;
 
+  /*
+  // DISABLED BY MICHAEL MOKRYSZ, CYBERSECURITY INTERNSHIP MAKING NETWORK SCANNING PRACTICAL
+  // INVOLVING FTP BOUNCE, 2016-08-16.
   if (session.sf_flags & SF_EPSV_ALL) {
     pr_response_add_err(R_500, _("Illegal PORT command, EPSV ALL in effect"));
     errno = EPERM;
     return PR_ERROR(cmd);
   }
+  */
 
   CHECK_CMD_ARGS(cmd, 2);
 
@@ -3610,7 +3614,7 @@ MODRET core_port(cmd_rec *cmd) {
   port_addr = pr_netaddr_get_addr(cmd->tmp_pool, buf, NULL);
   if (port_addr == NULL) {
     pr_log_debug(DEBUG1, "error getting sockaddr for '%s': %s", buf,
-      strerror(errno)); 
+      strerror(errno));
     pr_response_add_err(R_501, _("Illegal PORT command"));
     errno = EPERM;
     return PR_ERROR(cmd);
@@ -3643,7 +3647,7 @@ MODRET core_port(cmd_rec *cmd) {
       listen_addr = c->argv[0];
     }
   }
- 
+
   if (pr_netaddr_is_rfc1918(listen_addr) != TRUE &&
       pr_netaddr_is_rfc1918(session.c->remote_addr) != TRUE &&
       pr_netaddr_is_rfc1918(port_addr) == TRUE) {
@@ -3701,6 +3705,9 @@ MODRET core_port(cmd_rec *cmd) {
    * machines out there for whom the port number matters...
    */
 
+  /*
+  // DISABLED BY MICHAEL MOKRYSZ, CYBERSECURITY INTERNSHIP MAKING NETWORK SCANNING PRACTICAL
+  // INVOLVING FTP BOUNCE, 2016-08-16.
   if (port < 1024) {
     pr_log_pri(PR_LOG_WARNING,
       "Refused PORT %s (port %d below 1024, possible bounce attack)", cmd->arg,
@@ -3709,6 +3716,7 @@ MODRET core_port(cmd_rec *cmd) {
     errno = EPERM;
     return PR_ERROR(cmd);
   }
+  */
 
   memcpy(&session.data_addr, port_addr, sizeof(session.data_addr));
   session.data_port = port;
@@ -3974,14 +3982,20 @@ MODRET core_eprt(cmd_rec *cmd) {
    * machines out there for whom the port number matters...
    */
 
+  /*
+  // DISABLED BY MICHAEL MOKRYSZ, CYBERSECURITY INTERNSHIP MAKING NETWORK SCANNING PRACTICAL
+  // INVOLVING FTP BOUNCE, 2016-08-16.
   if (port < 1024) {
     pr_log_pri(PR_LOG_WARNING,
-      "Refused EPRT %s (port %d below 1024, possible bounce attack)", cmd->arg,
+      "Refused PORT %s (port %d below 1024, possible bounce attack)", cmd->arg,
       port);
-    pr_response_add_err(R_500, _("Illegal EPRT command"));
+    pr_response_add_err(R_500, _("Illegal PORT command"));
+
+    pr_cmd_set_errno(cmd, EPERM);
     errno = EPERM;
     return PR_ERROR(cmd);
   }
+  */
 
   /* Make sure we're using network byte order. */
   pr_netaddr_set_port(&na, htons(port));
@@ -4059,7 +4073,7 @@ MODRET core_epsv(cmd_rec *cmd) {
       errno = EINVAL;
       return PR_ERROR(cmd);
     }
- 
+
   } else {
 
     switch (pr_netaddr_get_family(session.c->local_addr)) {
@@ -4510,7 +4524,7 @@ MODRET core_post_host(cmd_rec *cmd) {
         PR_SESS_DISCONNECT_SESSION_INIT_FAILED, NULL);
     }
   }
-  
+
   return PR_DECLINED(cmd);
 }
 
@@ -4639,7 +4653,7 @@ MODRET _chdir(cmd_rec *cmd, char *ndir) {
     if (!use_cdpath &&
         pr_fsio_chdir_canon(ndir, 1) < 0) {
       use_cdpath = TRUE;
-    }            
+    }
 
     if (use_cdpath) {
       for (cdpath = find_config(main_server->conf,CONF_PARAM,"CDPath",TRUE);
@@ -4701,10 +4715,10 @@ MODRET _chdir(cmd_rec *cmd, char *ndir) {
     int bool = *((int *) c->argv[1]);
 
     if (bool) {
-   
+
       /* XXX Get rid of this CONF_USERDATA instance; it's the only
        * occurrence of it in the source.  Use the session.notes table instead.
-       */ 
+       */
       c = find_config(cmd->server->conf, CONF_USERDATA, session.cwd, FALSE);
       if (!c) {
         time(&prev);
@@ -4757,8 +4771,8 @@ MODRET core_rmd(cmd_rec *cmd) {
         dir);
       pr_response_add_err(R_550, _("%s: Forbidden filename"), cmd->arg);
       errno = EPERM;
-      return PR_ERROR(cmd); 
- 
+      return PR_ERROR(cmd);
+
     case PR_FILTER_ERR_FAILS_DENY_FILTER:
       pr_log_debug(DEBUG2, "'%s %s' denied by PathDenyFilter", cmd->argv[0],
         dir);
@@ -4834,8 +4848,8 @@ MODRET core_mkd(cmd_rec *cmd) {
         dir);
       pr_response_add_err(R_550, _("%s: Forbidden filename"), cmd->arg);
       errno = EPERM;
-      return PR_ERROR(cmd); 
- 
+      return PR_ERROR(cmd);
+
     case PR_FILTER_ERR_FAILS_DENY_FILTER:
       pr_log_debug(DEBUG2, "'%s %s' denied by PathDenyFilter", cmd->argv[0],
         dir);
@@ -4874,7 +4888,7 @@ MODRET core_mkd(cmd_rec *cmd) {
       strerror(xerrno));
 
     pr_response_add_err(R_550, "%s: %s", cmd->arg, strerror(xerrno));
- 
+
     errno = xerrno;
     return PR_ERROR(cmd);
   }
@@ -5010,8 +5024,8 @@ MODRET core_dele(cmd_rec *cmd) {
         path);
       pr_response_add_err(R_550, _("%s: Forbidden filename"), cmd->arg);
       errno = EPERM;
-      return PR_ERROR(cmd); 
- 
+      return PR_ERROR(cmd);
+
     case PR_FILTER_ERR_FAILS_DENY_FILTER:
       pr_log_debug(DEBUG2, "'%s %s' denied by PathDenyFilter", cmd->argv[0],
         path);
@@ -5076,7 +5090,7 @@ MODRET core_dele(cmd_rec *cmd) {
     return PR_ERROR(cmd);
   }
 #endif /* !EISDIR */
- 
+
   if (pr_fsio_unlink(path) < 0) {
     int xerrno = errno;
 
@@ -5140,8 +5154,8 @@ MODRET core_rnto(cmd_rec *cmd) {
         path);
       pr_response_add_err(R_550, _("%s: Forbidden filename"), cmd->arg);
       errno = EPERM;
-      return PR_ERROR(cmd); 
- 
+      return PR_ERROR(cmd);
+
     case PR_FILTER_ERR_FAILS_DENY_FILTER:
       pr_log_debug(DEBUG2, "'%s %s' denied by PathDenyFilter", cmd->argv[0],
         path);
@@ -5276,8 +5290,8 @@ MODRET core_rnfr(cmd_rec *cmd) {
         path);
       pr_response_add_err(R_550, _("%s: Forbidden filename"), cmd->arg);
       errno = EPERM;
-      return PR_ERROR(cmd); 
- 
+      return PR_ERROR(cmd);
+
     case PR_FILTER_ERR_FAILS_DENY_FILTER:
       pr_log_debug(DEBUG2, "'%s %s' denied by PathDenyFilter", cmd->argv[0],
         path);
@@ -5836,7 +5850,7 @@ static int core_sess_init(void) {
     timeout = (long) *((int *) c->argv[0]);
     pr_data_set_linger(timeout);
   }
- 
+
   /* Check for a configured DebugLevel. */
   debug_level = get_param_ptr(main_server->conf, "DebugLevel", FALSE);
   if (debug_level != NULL)
@@ -5954,7 +5968,7 @@ static int core_sess_init(void) {
 
   /* Set some Variable entries for Display files. */
 
-  if (pr_var_set(session.pool, "%{bytes_xfer}", 
+  if (pr_var_set(session.pool, "%{bytes_xfer}",
       "Number of bytes transfered in this transfer", PR_VAR_TYPE_FUNC,
       (void *) core_get_xfer_bytes_str, &session.xfer.total_bytes,
       sizeof(off_t *)) < 0) {
@@ -5970,7 +5984,7 @@ static int core_sess_init(void) {
       strerror(errno));
   }
 
-  if (pr_var_set(session.pool, "%{total_bytes_out}", 
+  if (pr_var_set(session.pool, "%{total_bytes_out}",
       "Number of bytes downloaded during a session", PR_VAR_TYPE_FUNC,
       (void *) core_get_sess_bytes_str, &session.total_bytes_out,
       sizeof(off_t *)) < 0) {
@@ -5978,7 +5992,7 @@ static int core_sess_init(void) {
       strerror(errno));
   }
 
-  if (pr_var_set(session.pool, "%{total_bytes_xfer}", 
+  if (pr_var_set(session.pool, "%{total_bytes_xfer}",
       "Number of bytes transfered during a session", PR_VAR_TYPE_FUNC,
       (void *) core_get_sess_bytes_str, &session.total_bytes,
       sizeof(off_t *)) < 0) {
@@ -5986,7 +6000,7 @@ static int core_sess_init(void) {
       strerror(errno));
   }
 
-  if (pr_var_set(session.pool, "%{total_files_in}", 
+  if (pr_var_set(session.pool, "%{total_files_in}",
       "Number of files uploaded during a session", PR_VAR_TYPE_FUNC,
       (void *) core_get_sess_files_str, &session.total_files_in,
       sizeof(unsigned int *)) < 0) {
@@ -5994,7 +6008,7 @@ static int core_sess_init(void) {
       strerror(errno));
   }
 
-  if (pr_var_set(session.pool, "%{total_files_out}", 
+  if (pr_var_set(session.pool, "%{total_files_out}",
       "Number of files downloaded during a session", PR_VAR_TYPE_FUNC,
       (void *) core_get_sess_files_str, &session.total_files_out,
       sizeof(unsigned int *)) < 0) {
@@ -6002,7 +6016,7 @@ static int core_sess_init(void) {
       strerror(errno));
   }
 
-  if (pr_var_set(session.pool, "%{total_files_xfer}", 
+  if (pr_var_set(session.pool, "%{total_files_xfer}",
       "Number of files transfered during a session", PR_VAR_TYPE_FUNC,
       (void *) core_get_sess_files_str, &session.total_files_xfer,
       sizeof(unsigned int *)) < 0) {
@@ -6049,7 +6063,7 @@ static int core_sess_init(void) {
   c = find_config(main_server->conf, CONF_PARAM, "ProcessTitles", FALSE);
   if (c) {
     char *verbosity;
- 
+
     verbosity = c->argv[0];
     if (strcasecmp(verbosity, "terse") == 0) {
       pr_proctitle_set_static_str("proftpd: processing connection");
