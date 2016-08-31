@@ -1,0 +1,8 @@
+/etc/proftpd/proftpd.conf
+
+# http://www.proftpd.org/docs/modules/mod_delay.html
+DelayEngine Off
+
+# http://www.ouah.org/ftpbounce.html
+# http://www.proftpd.org/docs/modules/mod_core.html#AllowForeignAddress
+AllowForeignAddress on
