@@ -1,0 +1,15 @@
+[Unit]
+Description = ProFTPD FTP Server
+After = network.target nss-lookup.target local-fs.target remote-fs.target
+
+[Service]
+Type = forking
+PIDFile = /usr/local/var/proftpd.pid
+ExecStart = /usr/local/sbin/proftpd
+ExecReload = /bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy = multi-user.target
+
+# nano /etc/systemd/system/proftpd.service
+# systemctl enable proftpd

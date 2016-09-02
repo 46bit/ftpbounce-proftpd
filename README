@@ -1,6 +1,41 @@
+                ProFTPD 1.3.x-CYBERPRACTICALS README
+                ====================================
 
-                        ProFTPD 1.3.x README
-                        ==================
+*** THIS VERSION OF PROFTPD IS DELIBERATELY COMPROMISED ***
+*** IT MUST NOT BE USED IN PRODUCTION, AND IF USED ON PUBLIC NETWORKS CAN BE
+    UTILISED FOR SCANNING PRIVATE NETWORKS, LAUNCHING DENIAL OF SERVICE ATTACKS,
+    COMPROMISING INTERNAL FTP SERVERS, SENDING SPECIFIED DATA TO SPECIFIED IPv4
+    ADDRESS AND PORTS, AND MORE ***
+
+Cyberpracticals Modifications
+-----------------------------
+
+This version of ProFTPD has been modified by Michael Mokrysz to enable
+the FTP Bounce attacks ( http://www.ouah.org/ftpbounce.html )
+
+These changes are to demonstrate using an FTP Server for Network Scanning.
+
+    o PORT commands are allowed to specify any IPv4 address and port number.
+        o Restricting the IPv4 address to be that of the client was disabled.
+        o Restricting the Port to be unprivileged (>= 1024) was disabled.
+        o Requiring PORT traffic to go out on the same network was disabled.
+
+Ensure the Debian ProFTPD package is not installed. Then:
+
+```
+make clean
+make
+make install
+cp sample-configurations/vulnerable-to-bounce.conf /etc/proftpd/proftpd.conf
+```
+
+To have ProFTPD 1.3.x-CYBERPRACTICALS start at boot with Systemd:
+
+```
+cp proftpd-systemd.service /etc/systemd/system/proftpd.service
+systemctl start proftpd.service
+systemctl enable proftpd.service
+```
 
 Introduction
 ------------
@@ -40,13 +75,13 @@ Major Features
 --------------
 
     o A single main configuration file, with directives and directive groups
-      patterned after those of the Apache web server. 
+      patterned after those of the Apache web server.
 
-    o Per directory ".ftpaccess" configuration similar to Apache's ".htaccess". 
+    o Per directory ".ftpaccess" configuration similar to Apache's ".htaccess".
 
     o Designed to run either as a stand-alone server or from inetd.
 
-    o Multiple virtual FTP servers and anonymous FTP services. 
+    o Multiple virtual FTP servers and anonymous FTP services.
 
     o Multiple passwd files.
 
@@ -61,13 +96,13 @@ Major Features
       are generated internally, without using an external ls command.
 
     o Anonymous FTP and other chroot directories do not require any specific
-      directory structure, executable programs or other system files. 
+      directory structure, executable programs or other system files.
 
     o Modular architecture with an API that facilitates well structured
       extensions to meet user needs.
 
     o Visibility of directories or files controlled based on Unix style
-      permissions or user/group ownership. 
+      permissions or user/group ownership.
 
     o Logging and utmp/wtmp support.  Logging is compatible with wu-ftpd,
       and extended, customizable logging is available.
@@ -76,7 +111,7 @@ Major Features
       non-privileged user in stand-alone mode, thwarting attacks aimed at
       exploiting "root" privileges.
 
-    o GPL source license.  The source code is available to audit. 
+    o GPL source license.  The source code is available to audit.
 
 
 
