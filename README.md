@@ -14,6 +14,7 @@ This version of ProFTPD has been modified by Michael Mokrysz to enable
 the FTP Bounce attacks ( http://www.ouah.org/ftpbounce.html )
 
 These changes are to demonstrate using an FTP Server for Network Scanning.
+For use in https://github.com/46bit/netscan-practical.
 
     o PORT commands are allowed to specify any IPv4 address and port number.
         o Restricting the IPv4 address to be that of the client was disabled.
