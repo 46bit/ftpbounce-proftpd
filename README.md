@@ -1,5 +1,5 @@
-                ProFTPD 1.3.x-CYBERPRACTICALS README
-                ====================================
+ProFTPD 1.3.x-CYBERPRACTICALS README
+====================================
 
 *** THIS VERSION OF PROFTPD IS DELIBERATELY COMPROMISED ***
 *** IT MUST NOT BE USED IN PRODUCTION, AND IF USED ON PUBLIC NETWORKS CAN BE
